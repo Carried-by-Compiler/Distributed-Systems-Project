@@ -27,7 +27,11 @@ public class StartWindow extends JFrame {
             password, email;
     private JButton login_submit, register_submit;
     
+    private DatabaseHandler dbHandler;
+    
     public StartWindow() {
+        dbHandler = new DatabaseHandler("john", "John1234");
+        
         init_components();
         
         this.setTitle("Start");
