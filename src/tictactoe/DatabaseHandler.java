@@ -5,11 +5,13 @@
  */
 package tictactoe;
 
+import java.util.List;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * This class is the program's access to the MySQL Database
@@ -49,6 +51,54 @@ public class DatabaseHandler {
             System.out.println("Class not found!");
             System.exit(-1);
         }
+    }
+    
+    /**
+     * Checks if entered username and password exists in the database
+     * 
+     * @param username Entered username
+     * @param password Entered password
+     * @return A boolean indicating if the input credentials are found
+     */
+    public boolean checkLogin(String username, String password) {
+        boolean found = false;
+        String query = "SELECT * FROM users WHERE username = \'" + username + 
+                "\' AND password = PASSWORD(\'" + password + "\')";
+        try {
+            prepStatement = connect.prepareStatement(query);
+            resultSet = prepStatement.executeQuery();
+            
+            if(resultSet.isBeforeFirst()) {
+                found = true;
+            } else {
+                found = false;
+            }
+        } catch(SQLException e) {
+            System.out.println(e.toString());
+            found = false;
+        }
+        
+        return found;
+    }
+    
+    public List<String> getNames(String user, String password) {
+        ArrayList<String> details = new ArrayList<String>();
+        String query = "SELECT name, surname FROM users WHERE username = \'" + 
+                user + "\' AND password = PASSWORD(\'" + password + "\');";
+        
+        try {
+            prepStatement = connect.prepareStatement(query);
+            resultSet = prepStatement.executeQuery();
+            
+            while(resultSet.next()) {
+                details.add(resultSet.getString("name"));
+                details.add(resultSet.getString("surname"));
+            }
+        } catch(SQLException e) {
+            System.out.println(e.toString());
+        }
+        
+        return details;
     }
     
     /**

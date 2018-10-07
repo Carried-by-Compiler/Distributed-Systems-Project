@@ -6,7 +6,7 @@ CREATE TABLE users (
     `surname`       VARCHAR(25) NOT NULL,
     `username`      VARCHAR(20) NOT NULL UNIQUE,
     `password`      VARCHAR(255),
-    `email`         VARCHAR(50) NOT NULL,
+    `email`         VARCHAR(50) NOT NULL UNIQUE,
     `is_active`     TINYINT DEFAULT 1,
     `access_level`  TINYINT DEFAULT 1,
 

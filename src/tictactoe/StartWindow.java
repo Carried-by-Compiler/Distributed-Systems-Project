@@ -5,10 +5,15 @@
  */
 package tictactoe;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,20 +22,29 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 /**
- *
+ * GUI class that lets the user login or register into the game. 
+ * 
  * @author John Rey Juele
  */
-public class StartWindow extends JFrame {
+public class StartWindow extends JFrame implements ActionListener {
     
     private JTextField login_username, login_password;
     private JTextField name, username, surname,
             password, email;
     private JButton login_submit, register_submit;
     
+    private JLabel outputStatus;
+    
     private DatabaseHandler dbHandler;
     
     public StartWindow() {
         dbHandler = new DatabaseHandler("john", "John1234");
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                dbHandler.close();
+            }
+        });
         
         init_components();
         
@@ -47,9 +61,12 @@ public class StartWindow extends JFrame {
         JPanel registerPanel = new JPanel(new GridBagLayout());
         
         // login
+        outputStatus = new JLabel();
         login_username = new JTextField(15);
         login_password = new JTextField(15);
         login_submit = new JButton("Login");
+        login_submit.addActionListener(this);
+        
         
         GridBagConstraints gc = new GridBagConstraints();
         gc.fill = GridBagConstraints.HORIZONTAL;
@@ -74,6 +91,10 @@ public class StartWindow extends JFrame {
         gc.gridx = 1;
         gc.gridy = 2;
         loginPanel.add(login_submit, gc);
+        
+        gc.gridx = 1;
+        gc.gridy = 3;
+        loginPanel.add(outputStatus, gc);
         //
         
         // register
@@ -83,6 +104,7 @@ public class StartWindow extends JFrame {
         password = new JTextField(15);
         email = new JTextField(15);
         register_submit = new JButton("Submit");
+        register_submit.addActionListener(this);
         
         gc.gridx = 0;
         gc.gridy = 0;
@@ -122,6 +144,33 @@ public class StartWindow extends JFrame {
         tabbedPane.addTab("Log-in", loginPanel);
         tabbedPane.addTab("Sign up", registerPanel);
         
-        this.add(tabbedPane);
+        getContentPane().add(tabbedPane);
     }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+        
+        if(source == login_submit) {
+            String uName = login_username.getText();
+            String pass = login_password.getText();
+            
+            if(dbHandler.checkLogin(uName, pass)) {
+                dbHandler.close();
+                new GameGUI(uName, pass);
+                
+                System.out.println("Closing StartWindow");
+                this.dispose();
+            } else {
+                outputStatus.setText("User not found");
+                outputStatus.setForeground(Color.RED);
+                outputStatus.setVisible(true);
+            }
+            
+        } else if(source == register_submit) {
+            
+        }
+    }
+    
+    
 }
